@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""
+Script to recursively collect all Python files and write them to a text file.
+"""
+import os
+from pathlib import Path
+
+
+def collect_python_files(root_dir, output_file):
+    """
+    Recursively find all .py files under root_dir and write them to output_file.
+    
+    Args:
+        root_dir: Root directory to search for Python files
+        output_file: Output text file path
+    """
+    root_path = Path(root_dir)
+    
+    if not root_path.exists():
+        print(f"Error: Directory {root_dir} does not exist")
+        return
+    
+    # Find all .py files recursively
+    py_files = sorted(root_path.rglob("*.py"))
+    
+    if not py_files:
+        print(f"No Python files found in {root_dir}")
+        return
+    
+    print(f"Found {len(py_files)} Python files")
+    
+    with open(output_file, 'w', encoding='utf-8') as out:
+        for py_file in py_files:
+            # Get relative path from root_dir
+            relative_path = py_file.relative_to(root_path)
+            
+            print(f"Processing: {relative_path}")
+            
+            # Write file header
+            out.write(f"{relative_path}\n")
+            out.write("```python\n")
+            
+            # Write file content
+            try:
+                with open(py_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    out.write(content)
+                    # Ensure content ends with newline
+                    if content and not content.endswith('\n'):
+                        out.write('\n')
+            except Exception as e:
+                out.write(f"# Error reading file: {e}\n")
+            
+            # Write file footer
+            out.write("```\n")
+            out.write("#EOF\n\n")
+    
+    print(f"\nAll files written to: {output_file}")
+
+
+if __name__ == "__main__":
+    # Configuration
+    ROOT_DIR = "backend/src"
+    OUTPUT_FILE = "all_py_files.txt"
+    
+    collect_python_files(ROOT_DIR, OUTPUT_FILE)
+
+================
+
+1. websocket
+
+
